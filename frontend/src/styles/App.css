@@ -1,0 +1,46 @@
+/* [AI] Application Styles
+   Specific styling for App component and page layouts
+*/
+
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.page-header {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.page-header h1 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+}
+
+.loading {
+    text-align: center;
+    padding: var(--spacing-2xl);
+}
+
+.error-message {
+    background-color: #fee2e2;
+    color: var(--danger-color);
+    padding: var(--spacing-md);
+    border-radius: 0.375rem;
+    margin-bottom: var(--spacing-lg);
+    border-left: 4px solid var(--danger-color);
+}
+
+.success-message {
+    background-color: #d1fae5;
+    color: var(--success-color);
+    padding: var(--spacing-md);
+    border-radius: 0.375rem;
+    margin-bottom: var(--spacing-lg);
+    border-left: 4px solid var(--success-color);
+}

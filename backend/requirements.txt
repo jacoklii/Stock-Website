@@ -1,0 +1,25 @@
+# [AI] Python Backend Dependencies
+# Flask and extensions
+Flask==2.3.2
+Flask-SQLAlchemy==3.0.5
+Flask-Cors==4.0.0
+Flask-JWT-Extended==4.4.4
+
+# Database
+SQLAlchemy==2.0.15
+python-dotenv==1.0.0
+
+# Data processing
+pandas==2.0.2
+numpy==1.24.3
+
+# API and scraping
+requests==2.31.0
+beautifulsoup4==4.12.2
+
+# Utilities
+bcrypt==4.0.1
+Werkzeug==2.3.6
+
+# Development
+pytest==7.3.1
