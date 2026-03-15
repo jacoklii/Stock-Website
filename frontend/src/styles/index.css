@@ -1,120 +1,171 @@
-/* [AI] Main CSS Stylesheet
-   Global styles and base styling for the Stock Portfolio Website
+/* [AI] Main CSS Stylesheet - Refined financial terminal design
+   Dark-first with light mode toggle. Dense, data-forward, professional.
 */
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root,
+[data-theme="dark"] {
+  /* Base - deep navy/charcoal */
+  --bg-base: #0D1117;
+  --bg-elevated: #161B22;
+  --bg-card: #21262d;
+  /* Gains and losses - never reversed */
+  --gain-color: #00FF88;
+  --gain-muted: #00C853;
+  --loss-color: #FF1744;
+  --loss-muted: #d32f2f;
+  /* Accent - electric green default */
+  --accent-color: #00FF88;
+  /* Text */
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --text-muted: #6e7681;
+  /* Border */
+  --border-color: #30363d;
+  --border-subtle: #21262d;
+  /* Primary/secondary for buttons */
+  --primary-color: #238636;
+  --secondary-color: #21262d;
+  --danger-color: #da3633;
+  --warning-color: #d29922;
+  --success-color: #3fb950;
+}
+
+[data-theme="light"] {
+  --bg-base: #f6f8fa;
+  --bg-elevated: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --border-subtle: #f1f5f9;
+  --primary-color: #238636;
+  --secondary-color: #eaeef2;
 }
 
 :root {
-    /* Color Palette */
-    --primary-color: #1e40af;
-    --secondary-color: #34d399;
-    --danger-color: #ef4444;
-    --warning-color: #f59e0b;
-    --success-color: #10b981;
-    --dark-bg: #0f172a;
-    --light-bg: #f8fafc;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --border-color: #e2e8f0;
-    
-    /* Spacing */
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-2xl: 3rem;
-    
-    /* Font */
-    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    --font-size-sm: 0.875rem;
-    --font-size-base: 1rem;
-    --font-size-lg: 1.125rem;
-    --font-size-xl: 1.5rem;
-    --font-size-2xl: 2rem;
+  /* Typography */
+  --font-mono: 'IBM Plex Mono', 'Roboto Condensed', monospace;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2);
+  /* Font sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
 }
 
 body {
-    font-family: var(--font-family);
-    color: var(--text-primary);
-    background-color: var(--light-bg);
-    font-size: var(--font-size-base);
-    line-height: 1.5;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background-color: var(--bg-base);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+
+[data-font-size="large"] {
+  font-size: 1.1rem;
 }
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
-    font-weight: 600;
-    line-height: 1.2;
+  font-weight: 600;
+  line-height: 1.2;
+  font-family: var(--font-body);
 }
 
-h1 {
-    font-size: var(--font-size-2xl);
-}
+h1 { font-size: var(--font-size-2xl); }
+h2 { font-size: var(--font-size-xl); }
+h3 { font-size: var(--font-size-lg); }
 
-h2 {
-    font-size: var(--font-size-xl);
-}
-
-h3 {
-    font-size: var(--font-size-lg);
+.font-mono {
+  font-family: var(--font-mono);
 }
 
 /* Buttons */
 .btn {
-    display: inline-block;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border: none;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    font-size: var(--font-size-base);
-    font-weight: 500;
-    transition: all 0.3s ease;
-    text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-family: var(--font-body);
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
-    color: white;
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
 }
 
 .btn-primary:hover {
-    background-color: #1e3a8a;
-    transform: translateY(-2px);
+  filter: brightness(1.1);
 }
 
 .btn-secondary {
-    background-color: var(--secondary-color);
-    color: white;
+  background-color: var(--secondary-color);
+  color: var(--text-primary);
 }
 
 .btn-secondary:hover {
-    background-color: #2fa98f;
+  background-color: var(--border-color);
 }
 
 .btn-danger {
-    background-color: var(--danger-color);
-    color: white;
+  background-color: var(--danger-color);
+  color: white;
+  border-color: var(--danger-color);
 }
 
 .btn-danger:hover {
-    background-color: #dc2626;
+  filter: brightness(1.1);
+}
+
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
 }
 
 /* Forms */
 .form-group {
-    margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
 label {
-    display: block;
-    margin-bottom: var(--spacing-sm);
-    font-weight: 500;
-    color: var(--text-primary);
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
 input[type="text"],
@@ -123,13 +174,20 @@ input[type="password"],
 input[type="number"],
 select,
 textarea {
-    width: 100%;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: 1px solid var(--border-color);
-    border-radius: 0.375rem;
-    font-family: var(--font-family);
-    font-size: var(--font-size-base);
-    transition: border-color 0.3s ease;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
 }
 
 input[type="text"]:focus,
@@ -138,49 +196,68 @@ input[type="password"]:focus,
 input[type="number"]:focus,
 select:focus,
 textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
 }
 
 /* Layout */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--spacing-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
 }
 
 .row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
 }
 
 .col {
-    flex: 1;
-    min-width: 250px;
+  flex: 1;
+  min-width: 250px;
 }
 
 /* Cards */
 .card {
-    background-color: white;
-    border-radius: 0.5rem;
-    padding: var(--spacing-lg);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 .card:hover {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
+}
+
+/* Gain/loss text - never reversed */
+.text-gain {
+  color: var(--gain-color);
+}
+
+.text-loss {
+  color: var(--loss-color);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .col {
-        flex: 1 1 100%;
-    }
-    
-    .row {
-        flex-direction: column;
-    }
+  .col {
+    flex: 1 1 100%;
+  }
+
+  .row {
+    flex-direction: column;
+  }
+}
+
+/* Fade-in animation for page load */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.page-enter {
+  animation: fadeIn 0.3s ease-out;
 }

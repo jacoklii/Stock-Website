@@ -1,0 +1,2 @@
+{"sessionId":"86a9e2","runId":"pre-fix","hypothesisId":"F1","location":"frontend/src/components/StockSearchInput.jsx:61","message":"Enter pressed with no open results","data":{"query":"GOOG","resultsLength":0},"timestamp":1773586318786}
+{"sessionId":"86a9e2","runId":"pre-fix","hypothesisId":"F1","location":"frontend/src/components/StockSearchInput.jsx:49","message":"handleSelect called","data":{"hasItem":true,"typeOfItem":"object"},"timestamp":1773586318787}

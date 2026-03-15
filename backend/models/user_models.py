@@ -3,7 +3,7 @@
 Defines the structure of all database tables using SQLAlchemy ORM
 """
 
-from app import db
+from extensions import db
 from datetime import datetime
 from sqlalchemy.dialects.sqlite import JSON
 

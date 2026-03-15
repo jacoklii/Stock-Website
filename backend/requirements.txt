@@ -10,16 +10,20 @@ SQLAlchemy==2.0.15
 python-dotenv==1.0.0
 
 # Data processing
-pandas==2.0.2
-numpy==1.24.3
+pandas>=2.1.0
+numpy>=1.26.0
 
 # API and scraping
 requests==2.31.0
 beautifulsoup4==4.12.2
 
+# Stock data
+yfinance>=1.2.0
+
 # Utilities
 bcrypt==4.0.1
 Werkzeug==2.3.6
+PyJWT==2.8.0
 
 # Development
 pytest==7.3.1
