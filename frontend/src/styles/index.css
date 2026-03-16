@@ -261,3 +261,33 @@ textarea:focus {
 .page-enter {
   animation: fadeIn 0.3s ease-out;
 }
+
+/* Continuous horizontal ticker (Apple-style) */
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-wrap {
+  overflow: hidden;
+  width: 100%;
+  padding: var(--spacing-sm) 0;
+  margin-bottom: var(--spacing-xl);
+}
+
+.ticker-inner {
+  display: flex;
+  flex-wrap: nowrap;
+  width: max-content;
+  animation: tickerScroll 60s linear infinite;
+}
+
+.ticker-inner:hover {
+  animation-play-state: paused;
+}
+
+.ticker-inner .ticker-item {
+  flex: 0 0 auto;
+  min-width: 140px;
+  margin-right: var(--spacing-md);
+}

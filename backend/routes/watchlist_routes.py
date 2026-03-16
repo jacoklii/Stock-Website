@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify, g
 from extensions import db
 from models.user_models import Portfolio, Watchlist
 from utils.decorators import require_jwt
+from utils.stock_fetcher import get_quote_summary
 
 watchlist_bp = Blueprint('watchlist', __name__)
 
@@ -39,7 +40,22 @@ def get_watchlist(portfolio_id):
         return jsonify({'error': 'Portfolio not found'}), err
 
     items = Watchlist.query.filter_by(portfolio_id=portfolio_id).order_by(Watchlist.added_date.desc()).all()
-    return jsonify([_watchlist_to_dict(w) for w in items]), 200
+
+    out = []
+    for w in items:
+        d = _watchlist_to_dict(w)
+        q = get_quote_summary(w.stock_symbol)
+        if q:
+            d.update({
+                'current_price': q.get('price'),
+                'open_price': q.get('open'),
+                'change_percent': q.get('change_percent'),
+                'low52': q.get('low_52w'),
+                'high52': q.get('high_52w'),
+            })
+        out.append(d)
+
+    return jsonify(out), 200
 
 
 @watchlist_bp.route('/<int:portfolio_id>/watchlist', methods=['POST'])

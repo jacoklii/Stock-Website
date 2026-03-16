@@ -59,11 +59,13 @@ function SummaryBar({ portfolio, holdings, cash }) {
 
 /**
  * MoverCard - Single market mover (ticker, name, price, % change).
+ * Accepts changePercent or change_percent from API.
  */
-function MoverCard({ symbol, name, price, changePercent }) {
+function MoverCard({ symbol, name, price, changePercent, change_percent }) {
+  const pct = changePercent ?? change_percent;
   const validPrice = Number.isFinite(Number(price));
-  const validChange = Number.isFinite(Number(changePercent));
-  const numChange = validChange ? Number(changePercent) : 0;
+  const validChange = Number.isFinite(Number(pct));
+  const numChange = validChange ? Number(pct) : 0;
   const isGain = numChange >= 0;
   return (
     <div className="card" style={{ flex: '1 1 140px', minWidth: 140 }}>
@@ -109,11 +111,13 @@ function HoldingTicker({ holding }) {
 
 /**
  * IndexBadge - S&P 500, NASDAQ, DOW with price and daily %.
+ * Accepts changePercent or change_percent from API.
  */
-function IndexBadge({ symbol, name, price, changePercent }) {
+function IndexBadge({ symbol, name, price, changePercent, change_percent }) {
+  const pct = changePercent ?? change_percent;
   const validPrice = Number.isFinite(Number(price));
-  const validChange = Number.isFinite(Number(changePercent));
-  const numChange = validChange ? Number(changePercent) : 0;
+  const validChange = Number.isFinite(Number(pct));
+  const numChange = validChange ? Number(pct) : 0;
   const isGain = numChange >= 0;
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', padding: 'var(--spacing-sm) var(--spacing-md)', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
@@ -129,11 +133,13 @@ function IndexBadge({ symbol, name, price, changePercent }) {
 
 /**
  * Small card for sliding strip (index/commodity/stock): symbol, price, % change.
+ * Accepts changePercent or change_percent from API.
  */
-function StripCard({ symbol, name, price, changePercent }) {
+function StripCard({ symbol, name, price, changePercent, change_percent }) {
+  const pct = changePercent ?? change_percent;
   const validPrice = Number.isFinite(Number(price));
-  const validChange = Number.isFinite(Number(changePercent));
-  const numChange = validChange ? Number(changePercent) : 0;
+  const validChange = Number.isFinite(Number(pct));
+  const numChange = validChange ? Number(pct) : 0;
   const isGain = numChange >= 0;
   return (
     <div style={{ flex: '0 0 auto', minWidth: 140, padding: 'var(--spacing-sm) var(--spacing-md)', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
@@ -172,7 +178,14 @@ export default function HomePage() {
     if (mRes.data) setMovers(mRes.data);
     if (iRes.data) setIndices(iRes.data);
     if (cRes.data) setCommodities(Array.isArray(cRes.data) ? cRes.data : []);
-    if (nRes.data) setNews(Array.isArray(nRes.data) ? nRes.data.slice(0, 5) : []);
+    if (nRes.data) {
+      const articles = Array.isArray(nRes.data?.articles)
+        ? nRes.data.articles
+        : Array.isArray(nRes.data)
+          ? nRes.data
+          : [];
+      setNews(articles.slice(0, 5));
+    }
     setLoading(false);
   }, [portfolio?.id]);
 
@@ -190,6 +203,19 @@ export default function HomePage() {
 
   const stockHoldings = (holdings ?? []).filter((h) => !isCommodity(h.ticker ?? h.symbol ?? ''));
 
+  /** Combined list for sliding ticker: indices + commodities + your stocks (normalized with change_percent → changePercent) */
+  const tickerItems = [
+    ...indices.map((idx) => ({ ...idx, changePercent: idx.change_percent ?? idx.changePercent, key: `idx-${idx.symbol}` })),
+    ...commodities.map((c) => ({ ...c, changePercent: c.change_percent ?? c.changePercent, key: `com-${c.symbol}` })),
+    ...stockHoldings.map((h) => ({
+      symbol: h.ticker ?? h.symbol,
+      name: h.company_name ?? h.ticker ?? h.symbol,
+      price: h.current_price ?? h.avg_cost,
+      changePercent: h.daily_change_percent ?? h.dailyChangePercent,
+      key: `stock-${h.ticker ?? h.symbol}`,
+    })),
+  ];
+
   const formatNextTime = (iso) => {
     if (!iso) return null;
     try {
@@ -201,82 +227,78 @@ export default function HomePage() {
   };
 
   return (
-    <div className="page-enter container">
-      <h1 style={{ marginBottom: 'var(--spacing-lg)' }}>Dashboard</h1>
-      {loading ? (
-        <SkeletonCard height="120px" />
-      ) : (
-        <SummaryBar portfolio={portfolio} holdings={holdings} cash={cash} />
-      )}
+    <div className="page-enter">
+      <div className="container">
+        <h1 style={{ marginBottom: 'var(--spacing-md)' }}>Dashboard</h1>
+        {loading ? (
+          <SkeletonCard height="120px" />
+        ) : (
+          <SummaryBar portfolio={portfolio} holdings={holdings} cash={cash} />
+        )}
+      </div>
 
+      {/* Full-width market open/close subheader across the page */}
       {!loading && marketStatus && (
-        <div style={{ marginBottom: 'var(--spacing-xl)' }}>
-          <span
-            style={{
-              display: 'inline-block',
-              padding: 'var(--spacing-xs) var(--spacing-md)',
-              borderRadius: 'var(--radius-md)',
-              background: marketStatus.open ? 'var(--gain-color)' : 'var(--loss-color)',
-              color: 'var(--bg-base)',
-              fontSize: 'var(--font-size-sm)',
-              fontWeight: 600,
-            }}
-          >
-            {marketStatus.message ?? (marketStatus.open ? 'Market Open' : 'Market Closed')}
-          </span>
+        <header
+          style={{
+            width: '100vw',
+            marginLeft: 'calc(-50vw + 50%)',
+            marginBottom: 'var(--spacing-lg)',
+            padding: 'var(--spacing-sm) var(--spacing-md)',
+            background: marketStatus.open ? 'var(--gain-color)' : 'var(--loss-color)',
+            color: 'var(--bg-base)',
+            fontSize: 'var(--font-size-base)',
+            fontWeight: 600,
+            textAlign: 'center',
+          }}
+        >
+          {marketStatus.message ?? (marketStatus.open ? 'Market Open' : 'Market Closed')}
           {marketStatus.nextOpen && !marketStatus.open && (
-            <span style={{ marginLeft: 'var(--spacing-md)', color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-              Opens {formatNextTime(marketStatus.nextOpen)}
-            </span>
+            <span style={{ fontWeight: 400, opacity: 0.9 }}> — Opens {formatNextTime(marketStatus.nextOpen)}</span>
           )}
           {marketStatus.nextClose && marketStatus.open && (
-            <span style={{ marginLeft: 'var(--spacing-md)', color: 'var(--text-secondary)', fontSize: 'var(--font-size-sm)' }}>
-              Closes {formatNextTime(marketStatus.nextClose)}
-            </span>
+            <span style={{ fontWeight: 400, opacity: 0.9 }}> — Closes {formatNextTime(marketStatus.nextClose)}</span>
           )}
-        </div>
+        </header>
       )}
 
-      <h2 style={{ marginBottom: 'var(--spacing-md)' }}>Market Indices</h2>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-xl)' }}>
+      {/* Single continuous sliding ticker: indices + commodities + your stocks (Apple-style) */}
+      <div className="container" style={{ paddingTop: 0 }}>
         {loading ? (
-          <SkeletonCard height="60px" style={{ flex: '1 1 200px' }} />
-        ) : indices.length > 0 ? (
-          indices.map((idx) => <IndexBadge key={idx.symbol} {...idx} />)
+          <SkeletonCard height="72px" style={{ marginBottom: 'var(--spacing-xl)' }} />
+        ) : tickerItems.length > 0 ? (
+          <div className="ticker-wrap">
+            <div className="ticker-inner">
+              {tickerItems.map((item) => (
+                <div key={`${item.key}-1`} className="ticker-item">
+                  <StripCard
+                    symbol={item.symbol}
+                    name={item.name}
+                    price={item.price}
+                    changePercent={item.changePercent}
+                    change_percent={item.change_percent}
+                  />
+                </div>
+              ))}
+              {tickerItems.map((item) => (
+                <div key={`${item.key}-2`} className="ticker-item">
+                  <StripCard
+                    symbol={item.symbol}
+                    name={item.name}
+                    price={item.price}
+                    changePercent={item.changePercent}
+                    change_percent={item.change_percent}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         ) : (
-          <p style={{ color: 'var(--text-secondary)' }}>No Data</p>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--spacing-xl)' }}>No Data</p>
         )}
       </div>
 
-      <h2 style={{ marginBottom: 'var(--spacing-md)' }}>Commodity Trends</h2>
-      <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-xl)', overflowX: 'auto', paddingBottom: 'var(--spacing-sm)' }}>
-        {loading ? (
-          <SkeletonCard height="80px" style={{ minWidth: 140 }} />
-        ) : commodities.length > 0 ? (
-          commodities.map((c) => <StripCard key={c.symbol} {...c} />)
-        ) : (
-          <p style={{ color: 'var(--text-secondary)' }}>No Data</p>
-        )}
-      </div>
-
-      <h2 style={{ marginBottom: 'var(--spacing-md)' }}>Your Stocks</h2>
-      <div style={{ display: 'flex', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-xl)', overflowX: 'auto', paddingBottom: 'var(--spacing-sm)' }}>
-        {loading ? (
-          <SkeletonCard height="80px" style={{ minWidth: 140 }} />
-        ) : stockHoldings.length > 0 ? (
-          stockHoldings.map((h) => (
-            <StripCard
-              key={h.ticker ?? h.symbol}
-              symbol={h.ticker ?? h.symbol}
-              name={h.company_name ?? h.ticker ?? h.symbol}
-              price={h.current_price ?? h.avg_cost}
-              changePercent={h.daily_change_percent}
-            />
-          ))
-        ) : (
-          <p style={{ color: 'var(--text-secondary)' }}>No Data</p>
-        )}
-      </div>
+      <div className="container">
 
       <h2 style={{ marginBottom: 'var(--spacing-md)' }}>Big Market Movers</h2>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--spacing-md)', marginBottom: 'var(--spacing-xl)' }}>
@@ -326,6 +348,7 @@ export default function HomePage() {
         ) : (
           <p style={{ color: 'var(--text-secondary)' }}>No Data</p>
         )}
+      </div>
       </div>
     </div>
   );

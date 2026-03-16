@@ -17,15 +17,26 @@ export default function WatchlistPage() {
   const { portfolio } = usePortfolio();
   const [editMode, setEditMode] = useState(false);
   const [tickerToAdd, setTickerToAdd] = useState('');
-  const [news, setNews] = useState([]);
+  const [news, setNews] = useState({ groups: [], articles: [] });
   const [loading, setLoading] = useState(false);
   const [removeTarget, setRemoveTarget] = useState(null);
 
   useEffect(() => {
     if (portfolio?.id) {
-      getWatchlistNews(portfolio.id).then(({ data }) =>
-        setNews(Array.isArray(data) ? data : [])
-      );
+      getWatchlistNews(portfolio.id).then(({ data }) => {
+        if (data && (Array.isArray(data.groups) || Array.isArray(data.articles))) {
+          setNews({
+            groups: Array.isArray(data.groups) ? data.groups : [],
+            articles: Array.isArray(data.articles) ? data.articles : [],
+          });
+        } else {
+          // Backwards compatibility: data is a flat list.
+          setNews({
+            groups: [],
+            articles: Array.isArray(data) ? data : [],
+          });
+        }
+      });
     }
   }, [portfolio?.id]);
 
@@ -163,9 +174,32 @@ export default function WatchlistPage() {
       </div>
 
       <h3 style={{ marginBottom: 'var(--spacing-md)' }}>Watchlist News</h3>
+      {news.groups.length > 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)', marginBottom: 'var(--spacing-xl)' }}>
+          {news.groups.map((g) => (
+            <section key={g.symbol}>
+              <h4 style={{ marginBottom: 'var(--spacing-sm)' }}>{g.symbol}</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--spacing-md)' }}>
+                {(g.articles ?? []).slice(0, 3).map((a, i) => (
+                  <NewsCard
+                    key={a.url ?? `${g.symbol}-${i}`}
+                    title={a.title ?? a.headline}
+                    source={a.source?.name ?? a.source}
+                    url={a.url}
+                    publishedAt={a.publishedAt ?? a.published_at ?? a.date}
+                    tickers={a.tickers ?? [g.symbol]}
+                    summary={a.summary ?? a.description}
+                  />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      ) : null}
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 'var(--spacing-md)' }}>
-        {news.length > 0 ? (
-          news.map((a, i) => (
+        {news.articles.length > 0 ? (
+          news.articles.map((a, i) => (
             <NewsCard
               key={a.url ?? i}
               title={a.title ?? a.headline}
@@ -176,9 +210,9 @@ export default function WatchlistPage() {
               summary={a.summary ?? a.description}
             />
           ))
-        ) : (
+        ) : news.groups.length === 0 ? (
           <p style={{ color: 'var(--text-secondary)' }}>No news for watchlist tickers.</p>
-        )}
+        ) : null}
       </div>
 
       <ConfirmModal

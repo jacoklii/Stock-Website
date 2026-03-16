@@ -31,7 +31,7 @@ def _get_portfolio_or_404(portfolio_id):
 
 
 def _holding_to_dict(h, daily_change_percent=None, total_return_percent=None):
-    """Convert Holdings model to JSON-serializable dict. Optionally include daily_change_percent and total_return_percent."""
+    """Convert Holdings model to JSON-serializable dict. Always include daily_change_percent and total_return_percent (use 0 when unknown)."""
     d = {
         'holding_id': h.holding_id,
         'stock_symbol': h.stock_symbol,
@@ -40,10 +40,14 @@ def _holding_to_dict(h, daily_change_percent=None, total_return_percent=None):
         'current_price': float(h.current_price),
         'total_value': float(h.total_value or 0),
     }
-    if daily_change_percent is not None:
-        d['daily_change_percent'] = round(float(daily_change_percent), 2)
-    if total_return_percent is not None:
-        d['total_return_percent'] = round(float(total_return_percent), 2)
+    try:
+        d['daily_change_percent'] = round(float(daily_change_percent if daily_change_percent is not None else 0), 2)
+    except (TypeError, ValueError):
+        d['daily_change_percent'] = 0
+    try:
+        d['total_return_percent'] = round(float(total_return_percent if total_return_percent is not None else 0), 2)
+    except (TypeError, ValueError):
+        d['total_return_percent'] = 0
     return d
 
 

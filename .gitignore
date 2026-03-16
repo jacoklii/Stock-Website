@@ -44,9 +44,10 @@ yarn-error.log
 .env.test.local
 .env.production.local
 
-# VS Code
+# VS Code / Cursor
 .vscode/
 *.code-workspace
+.cursor/
 
 # OS
 .DS_Store

@@ -159,6 +159,61 @@ def get_price_and_change(ticker):
     return _with_timeout(_get, timeout=YF_TIMEOUT, default=None)
 
 
+def get_quote_summary(ticker):
+    """
+    Get a compact quote snapshot for tables (watchlist/holdings).
+    Returns:
+        dict: {
+          'price': float|None,
+          'open': float|None,
+          'change_percent': float|None,
+          'low_52w': float|None,
+          'high_52w': float|None,
+        }
+    """
+    if not yf or not ticker:
+        return None
+
+    symbol = str(ticker).upper()
+
+    def _get():
+        try:
+            t = _ticker_obj(symbol)
+            out = {
+                'price': None,
+                'open': None,
+                'change_percent': None,
+                'low_52w': None,
+                'high_52w': None,
+            }
+
+            # Price + change from history
+            pc = get_price_and_change(symbol)
+            if pc:
+                out['price'] = pc.get('price')
+                out['change_percent'] = pc.get('change_percent')
+
+            # Open + 52w range from fast_info/info
+            fi = getattr(t, 'fast_info', None)
+            if fi is not None:
+                out['open'] = _safe_float(getattr(fi, 'open', None), default=out['open'])
+                out['low_52w'] = _safe_float(getattr(fi, 'year_low', None), default=out['low_52w'])
+                out['high_52w'] = _safe_float(getattr(fi, 'year_high', None), default=out['high_52w'])
+
+            # Fallback to .info only if needed (can be slower)
+            if out['open'] is None or out['low_52w'] is None or out['high_52w'] is None:
+                info = getattr(t, 'info', None) or {}
+                if isinstance(info, dict):
+                    out['open'] = out['open'] if out['open'] is not None else _safe_float(info.get('open'))
+                    out['low_52w'] = out['low_52w'] if out['low_52w'] is not None else _safe_float(info.get('fiftyTwoWeekLow'))
+                    out['high_52w'] = out['high_52w'] if out['high_52w'] is not None else _safe_float(info.get('fiftyTwoWeekHigh'))
+
+            return out
+        except Exception:
+            return None
+
+    return _with_timeout(_get, timeout=YF_TIMEOUT, default=None)
+
 def get_movers():
     """
     Get top gainers and losers with real % change from history.

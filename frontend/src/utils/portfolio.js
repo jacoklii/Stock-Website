@@ -16,7 +16,7 @@ function normalizePortfolio(p) {
   };
 }
 
-/** Normalize holding for frontend (ticker, shares, avg_cost, market_value) */
+/** Normalize holding for frontend (ticker, shares, avg_cost, market_value, daily_change_percent) */
 function normalizeHolding(h) {
   if (!h) return null;
   return {
@@ -30,6 +30,8 @@ function normalizeHolding(h) {
     average_cost: h.average_cost ?? h.avg_cost,
     market_value: h.market_value ?? h.total_value,
     total_value: h.total_value ?? h.market_value,
+    daily_change_percent: h.daily_change_percent ?? h.dailyChangePercent,
+    total_return_percent: h.total_return_percent ?? h.totalReturnPercent,
   };
 }
 
